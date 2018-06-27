@@ -1,0 +1,58 @@
+.App {
+  text-align: center;
+}
+
+.App-header {
+  background-color: #222;
+  height: 100px;
+  padding: 10px;
+  color: white;
+}
+
+.App-title {
+  font-size: 1.5em;
+}
+
+.App-intro {
+  font-size: large;
+}
+
+#search {
+  float: right;
+}
+
+#wrapper {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-gap: 10px;
+  background-color: #222;
+  margin: 40px;
+  margin-top: 60px;
+}
+
+#central-column {
+  border-left: thin solid black;
+  border-right: thin solid black;
+  grid-column: 2/3;
+  width: 60vw;
+  text-align: left;
+}
+
+.article {
+  display: grid;
+  grid-template-rows: repeat(3);
+  grid-gap: 2px;
+}
+
+.article-header {
+  color: red;
+}
+
+.article-footer {
+  color: red;
+}
+
+body {
+  background-color: #000;
+  color: aliceblue;
+}
