@@ -1,12 +1,15 @@
 import React, { Component } from "react";
 import axios from "axios";
-import { Link } from "react-router-dom";
+import { Route } from "react-router-dom";
+import ArticleList from "./ArticleList";
+import Article from "./Article";
 //import * as api from "../api";
 
 class Articles extends Component {
   state = {
     articles: [],
-    currentArticle: ""
+    currentArticle: "",
+    view: "normal"
   };
 
   componentDidMount() {
@@ -21,49 +24,25 @@ class Articles extends Component {
   }
   render() {
     return (
-      <div id="central-column">
-        {this.state.articles.map(article => {
-          let { title, votes, comments, created_by, body } = article;
-          const id = article._id;
-          return (
-            <div className="article" key={article._id}>
-              <p>
-                <Link to="/articles/:article_id">
-                  <span
-                    className="article-header"
-                    onClick={this.handleArticleClick}
-                  >
-                    {title}{" "}
-                  </span>
-                </Link>
-                <span className="article-body"> {body}</span>
-                <div className="article-footer">
-                  <span> Author: {created_by}</span>
-                  <span> Votes: {votes}</span>
-                  <span> Comments: {comments}</span>
-                </div>
-              </p>
-              <button value={id} name="up-button" onClick={this.handleClick}>
-                up
-              </button>
-              <button value={id} name="down-button" onClick={this.handleClick}>
-                down
-              </button>
-            </div>
-          );
-        })}
+      <div>
+        <ArticleList
+          handleArticleClick={this.handleArticleClick}
+          handleClick={this.handleClick}
+          articles={this.state.articles}
+        />
       </div>
     );
   }
-
   handleArticleClick = e => {
     this.setState({
-      currentArticle: e.target.innerText
+      currentArticle: e.target.id
     });
   };
 
   handleClick = e => {
-    e.target.name === "up-button"
+    const key = e.target.className;
+    let voteModify = e.target.name === "up" ? 1 : -1;
+    e.target.name === "up"
       ? axios.put(
           `https://nc-news-portfolio.herokuapp.com/api/articles/${
             e.target.value
@@ -74,6 +53,12 @@ class Articles extends Component {
             e.target.value
           }?vote=down`
         );
+
+    let updatedArticles = [...this.state.articles];
+    updatedArticles[key].votes += voteModify;
+    this.setState({
+      articles: updatedArticles
+    });
   };
 }
 

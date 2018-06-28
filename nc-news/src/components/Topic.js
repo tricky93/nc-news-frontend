@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import axios from "axios";
 import * as api from "../api";
+import ArticleList from "./ArticleList";
 
 class Topic extends Component {
   state = {
@@ -14,7 +15,6 @@ class Topic extends Component {
         `https://nc-news-portfolio.herokuapp.com/api/topics/${slug}/articles`
       )
       .then(({ data }) => {
-        console.log(data.articles);
         this.setState({
           articles: data.articles
         });
@@ -37,26 +37,40 @@ class Topic extends Component {
 
   render() {
     return (
-      <div id="central-column">
-        {this.state.articles.map(article => {
-          let { title, votes, comments, created_by, body } = article;
-          return (
-            <div className="article" key={article._id}>
-              <p>
-                <span className="article-header"> {title}: </span>
-                <span className="article-body"> {body}</span>
-                <div className="article-footer">
-                  <span> Author: {created_by}</span>
-                  <span> Votes: {votes}</span>
-                  <span> Comments: {comments}</span>
-                </div>
-              </p>
-            </div>
-          );
-        })}
-      </div>
+      <ArticleList
+        handleArticleClick={this.handleArticleClick}
+        handleClick={this.handleClick}
+        articles={this.state.articles}
+      />
     );
   }
+  handleArticleClick = e => {
+    this.setState({
+      currentArticle: e.target.id
+    });
+  };
+
+  handleClick = e => {
+    const key = e.target.className;
+    let voteModify = e.target.name === "up" ? 1 : -1;
+    e.target.name === "up"
+      ? axios.put(
+          `https://nc-news-portfolio.herokuapp.com/api/articles/${
+            e.target.value
+          }?vote=up`
+        )
+      : axios.put(
+          `https://nc-news-portfolio.herokuapp.com/api/articles/${
+            e.target.value
+          }?vote=down`
+        );
+
+    let updatedArticles = [...this.state.articles];
+    updatedArticles[key].votes += voteModify;
+    this.setState({
+      articles: updatedArticles
+    });
+  };
 }
 
 export default Topic;
