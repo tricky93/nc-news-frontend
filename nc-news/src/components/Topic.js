@@ -1,36 +1,32 @@
 import React, { Component } from "react";
-import axios from "axios";
 import * as api from "../api";
 import ArticleList from "./ArticleList";
 
 class Topic extends Component {
   state = {
-    articles: []
+    articles: [],
+    currentArticle: ""
   };
 
   componentDidMount() {
-    let slug = this.props.match.params.topic;
-    axios
-      .get(
-        `https://nc-news-portfolio.herokuapp.com/api/topics/${slug}/articles`
-      )
-      .then(({ data }) => {
+    let topicSlug = this.props.match.params.topic;
+    api
+      .fetchArticlesByTopic(topicSlug)
+      .then(articles => {
         this.setState({
-          articles: data.articles
+          articles
         });
       })
       .catch(console.log);
   }
 
   componentDidUpdate(prevProps, prevState) {
-    let slug = this.props.match.params.topic;
+    let topicSlug = this.props.match.params.topic;
     if (this.props !== prevProps)
-      axios
-        .get(
-          `https://nc-news-portfolio.herokuapp.com/api/topics/${slug}/articles`
-        )
-        .then(({ data }) => {
-          this.setState({ articles: data.articles });
+      api
+        .fetchArticlesByTopic(topicSlug)
+        .then(articles => {
+          this.setState({ articles });
         })
         .catch(console.log);
   }
@@ -51,20 +47,14 @@ class Topic extends Component {
   };
 
   handleClick = e => {
-    const key = e.target.className;
-    let voteModify = e.target.name === "up" ? 1 : -1;
-    e.target.name === "up"
-      ? axios.put(
-          `https://nc-news-portfolio.herokuapp.com/api/articles/${
-            e.target.value
-          }?vote=up`
-        )
-      : axios.put(
-          `https://nc-news-portfolio.herokuapp.com/api/articles/${
-            e.target.value
-          }?vote=down`
-        );
+    this.changeVoteCount(e);
+  };
 
+  handleClick = e => {
+    const voteType = e.target.value;
+    api.modifyVotes(voteType);
+    let key = e.target.className;
+    let voteModify = e.target.name === "up" ? 1 : -1;
     let updatedArticles = [...this.state.articles];
     updatedArticles[key].votes += voteModify;
     this.setState({

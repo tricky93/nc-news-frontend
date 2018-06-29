@@ -1,42 +1,57 @@
 import React, { Component } from "react";
 import axios from "axios";
+import * as api from "../api";
 
 class Comments extends Component {
-  state = { comments: [] };
+  state = { comments: [], currentComment: "" };
+
   componentDidMount() {
     const articleId = this.props.match.params.article_id;
-    axios
-      .get(
-        `https://nc-news-portfolio.herokuapp.com/api/articles/${articleId}/comments`
-      )
-      .then(({ data }) => {
+    api
+      .fetchCommentsByArticle(articleId)
+      .then(comments => {
         this.setState({
-          comments: data.comments
+          comments
         });
       })
       .catch(console.log);
   }
+
+  componentDidUpdate(prevProps, prevState) {
+    const articleId = this.props.match.params.article_id;
+    if (this.state !== prevState) {
+      api
+        .fetchCommentsByArticle(articleId)
+        .then(comments => {
+          this.setState({
+            comments
+          });
+        })
+        .catch(console.log);
+    }
+  }
+
   render() {
     const { comments } = this.state;
     return (
       <div>
-        <h1>comment title</h1>
+        <h1>name of article</h1>
         {comments.map((comment, index) => {
           const id = comment._id;
           return (
             <div>
               <div>
                 <p>{comment.body}</p>
-                <h2>
-                  <span>{comment.created_at}</span>
-                  <span>{comment.created_by}</span>
-                  <span>{comment.votes}</span>
-                </h2>
+                <p>
+                  <span>created {comment.created_at} </span>
+                  <span>author {comment.created_by} </span>
+                  <span>votes {comment.votes}</span>
+                </p>
               </div>
               <button
                 className={index}
                 value={id}
-                name="up"
+                name="comments"
                 onClick={this.handleClick}
               >
                 up
@@ -44,7 +59,7 @@ class Comments extends Component {
               <button
                 className={index}
                 value={id}
-                name="down"
+                name="comments"
                 onClick={this.handleClick}
               >
                 down
@@ -52,15 +67,7 @@ class Comments extends Component {
               <button
                 className={index}
                 value={id}
-                name="add"
-                onClick={this.handleClick}
-              >
-                add
-              </button>
-              <button
-                className={index}
-                value={id}
-                name="delete"
+                name="comments"
                 onClick={this.handleClick}
               >
                 delete
@@ -73,30 +80,39 @@ class Comments extends Component {
   }
 
   handleClick = e => {
-    const action = e.target.name;
-    action === "up" || action === "down" ? this.changeVote(e) : null;
+    const action = e.target.innerText;
+    if (action === "delete") this.deleteComment(e);
+    else this.changeVote(e);
+  };
+
+  deleteComment = e => {
+    const commentId = e.target.value;
+    if (window.confirm("Do you really want to delete this comment?")) {
+      axios.delete(
+        `https://nc-news-portfolio.herokuapp.com/api/comments/${commentId}`
+      );
+      this.setState({
+        currentComment: `${commentId}`
+      });
+      window.alert("Comment will be deleted");
+    }
   };
 
   changeVote = e => {
+    const endpoint = e.target.name;
+    const id = e.target.value;
+    const voteType = e.target.innerText;
+    api.modifyVotes(endpoint, id, voteType);
     const key = e.target.className;
-    let voteModify = e.target.name === "up" ? 1 : -1;
-    e.target.name === "up"
-      ? axios.put(
-          `https://nc-news-portfolio.herokuapp.com/api/comments/${
-            e.target.value
-          }?vote=up`
-        )
-      : axios.put(
-          `https://nc-news-portfolio.herokuapp.com/api/comments/${
-            e.target.value
-          }?vote=down`
-        );
-
-    let updatedComments = [...this.state.comments];
-    updatedComments[key].votes += voteModify;
-    this.setState({
-      articles: updatedComments
+    const voteModify = e.target.innerText === "up" ? 1 : -1;
+    const updatedComments = this.state.comments.map((comment, index) => {
+      const newComment = { ...comment };
+      if (index === key) {
+        comment.votes += voteModify;
+      }
+      return newComment;
     });
+    this.setState({ comments: updatedComments });
   };
 }
 

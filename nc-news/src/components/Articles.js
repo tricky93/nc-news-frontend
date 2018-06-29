@@ -1,9 +1,6 @@
 import React, { Component } from "react";
-import axios from "axios";
-import { Route } from "react-router-dom";
+import * as api from "../api";
 import ArticleList from "./ArticleList";
-import Article from "./Article";
-//import * as api from "../api";
 
 class Articles extends Component {
   state = {
@@ -13,24 +10,34 @@ class Articles extends Component {
   };
 
   componentDidMount() {
-    axios
-      .get("https://nc-news-portfolio.herokuapp.com/api/articles")
-      .then(({ data }) => {
+    api
+      .fetchArticles()
+      .then(articles => {
         this.setState({
-          articles: data.articles
+          articles
         });
       })
       .catch(console.log);
   }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (this.state !== prevState) {
+      api
+        .fetchArticles()
+        .then(articles => {
+          this.setState({ articles });
+        })
+        .catch(console.log);
+    }
+  }
+
   render() {
     return (
-      <div>
-        <ArticleList
-          handleArticleClick={this.handleArticleClick}
-          handleClick={this.handleClick}
-          articles={this.state.articles}
-        />
-      </div>
+      <ArticleList
+        handleArticleClick={this.handleArticleClick}
+        handleClick={this.handleClick}
+        articles={this.state.articles}
+      />
     );
   }
   handleArticleClick = e => {
@@ -40,22 +47,25 @@ class Articles extends Component {
   };
 
   handleClick = e => {
-    const key = e.target.className;
-    let voteModify = e.target.name === "up" ? 1 : -1;
-    e.target.name === "up"
-      ? axios.put(
-          `https://nc-news-portfolio.herokuapp.com/api/articles/${
-            e.target.value
-          }?vote=up`
-        )
-      : axios.put(
-          `https://nc-news-portfolio.herokuapp.com/api/articles/${
-            e.target.value
-          }?vote=down`
-        );
+    const action = e.target.innerText;
+    action === "up" || action === "down" ? this.changeVoteCount(e) : null;
+  };
 
-    let updatedArticles = [...this.state.articles];
-    updatedArticles[key].votes += voteModify;
+  changeVoteCount = e => {
+    const endpoint = e.target.name;
+    const id = e.target.value;
+    const voteType = e.target.innerText;
+    api.modifyVotes(endpoint, id, voteType);
+    const key = e.target.className;
+    const voteModify = e.target.innerText === "up" ? 1 : -1;
+    const updatedArticles = this.state.articles.map((article, index) => {
+      const newArticle = { ...article };
+      if (index === key) {
+        console.log("hello");
+        article.votes += voteModify;
+      }
+      return newArticle;
+    });
     this.setState({
       articles: updatedArticles
     });

@@ -1,24 +1,25 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
+import * as api from "../api";
+import AddComment from "./AddComment";
 
 class Article extends Component {
-  state = { article: {} };
+  state = { article: {}, addComment: false };
+
   componentDidMount() {
     const articleId = this.props.match.params.article_id;
-    axios
-      .get(`https://nc-news-portfolio.herokuapp.com/api/articles/${articleId}`)
-      .then(({ data }) => {
-        this.setState({
-          article: data.article
-        });
+    api.fetchArticle(articleId).then(article => {
+      this.setState({
+        article
       });
+    });
   }
+
   render() {
     let { title, votes, comments, created_by, body } = this.state.article;
     const id = this.state.article._id;
     return (
-      <div className="article">
+      <div>
         <p>
           <span
             className="article-header"
@@ -39,15 +40,27 @@ class Article extends Component {
             </Link>
           </div>
         </p>
-        <button value={id} name="up-button" onClick={this.props.handleClick}>
+        <button value={id} name="up" onClick={this.props.handleClick}>
           up
         </button>
-        <button value={id} name="down-button" onClick={this.props.handleClick}>
+        <button value={id} name="down" onClick={this.props.handleClick}>
           down
         </button>
+        <button value={id} name="comment" onClick={this.handleClick}>
+          comment
+        </button>
+        <div>
+          {this.state.addComment && (
+            <AddComment articleTitle={title} articleId={id} />
+          )}
+        </div>
       </div>
     );
   }
+  handleClick = () => {
+    const comment = !this.state.addComment;
+    this.setState({ addComment: comment });
+  };
 }
 
 export default Article;
