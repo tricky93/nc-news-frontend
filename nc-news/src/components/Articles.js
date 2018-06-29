@@ -6,7 +6,8 @@ class Articles extends Component {
   state = {
     articles: [],
     currentArticle: "",
-    view: "normal"
+    view: "normal",
+    update: false
   };
 
   componentDidMount() {
@@ -21,11 +22,11 @@ class Articles extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (this.state !== prevState) {
+    if (this.state.update !== prevState.update) {
       api
         .fetchArticles()
         .then(articles => {
-          this.setState({ articles });
+          this.setState({ articles, update: false });
         })
         .catch(console.log);
     }
@@ -47,28 +48,24 @@ class Articles extends Component {
   };
 
   handleClick = e => {
-    const action = e.target.innerText;
-    action === "up" || action === "down" ? this.changeVoteCount(e) : null;
+    this.changeVoteCount(e);
   };
 
   changeVoteCount = e => {
-    const endpoint = e.target.name;
+    const collection = e.target.name;
     const id = e.target.value;
     const voteType = e.target.innerText;
-    api.modifyVotes(endpoint, id, voteType);
+    api.modifyVotes(collection, id, voteType);
     const key = e.target.className;
     const voteModify = e.target.innerText === "up" ? 1 : -1;
     const updatedArticles = this.state.articles.map((article, index) => {
       const newArticle = { ...article };
       if (index === key) {
-        console.log("hello");
         article.votes += voteModify;
       }
       return newArticle;
     });
-    this.setState({
-      articles: updatedArticles
-    });
+    this.setState({ updatedArticles, update: true });
   };
 }
 

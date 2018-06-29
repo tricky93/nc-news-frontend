@@ -5,7 +5,8 @@ import ArticleList from "./ArticleList";
 class Topic extends Component {
   state = {
     articles: [],
-    currentArticle: ""
+    currentArticle: "",
+    update: false
   };
 
   componentDidMount() {
@@ -22,13 +23,17 @@ class Topic extends Component {
 
   componentDidUpdate(prevProps, prevState) {
     let topicSlug = this.props.match.params.topic;
-    if (this.props !== prevProps)
+    if (
+      this.state.update !== prevState.update ||
+      topicSlug !== prevProps.match.params.topic
+    ) {
       api
         .fetchArticlesByTopic(topicSlug)
         .then(articles => {
-          this.setState({ articles });
+          this.setState({ articles, update: false });
         })
         .catch(console.log);
+    }
   }
 
   render() {
@@ -50,16 +55,21 @@ class Topic extends Component {
     this.changeVoteCount(e);
   };
 
-  handleClick = e => {
-    const voteType = e.target.value;
-    api.modifyVotes(voteType);
-    let key = e.target.className;
-    let voteModify = e.target.name === "up" ? 1 : -1;
-    let updatedArticles = [...this.state.articles];
-    updatedArticles[key].votes += voteModify;
-    this.setState({
-      articles: updatedArticles
+  changeVoteCount = e => {
+    const collection = e.target.name;
+    const id = e.target.value;
+    const voteType = e.target.innerText;
+    api.modifyVotes(collection, id, voteType);
+    const key = e.target.className;
+    const voteModify = e.target.innerText === "up" ? 1 : -1;
+    const updatedArticles = this.state.articles.map((article, index) => {
+      const newArticle = { ...article };
+      if (index === key) {
+        article.votes += voteModify;
+      }
+      return newArticle;
     });
+    this.setState({ updatedArticles, update: true });
   };
 }
 

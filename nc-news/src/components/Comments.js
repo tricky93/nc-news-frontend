@@ -1,9 +1,13 @@
 import React, { Component } from "react";
 import axios from "axios";
 import * as api from "../api";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+import Vote from "./Vote";
+dayjs.extend(relativeTime);
 
 class Comments extends Component {
-  state = { comments: [], currentComment: "" };
+  state = { comments: [], currentComment: "", update: false };
 
   componentDidMount() {
     const articleId = this.props.match.params.article_id;
@@ -19,18 +23,15 @@ class Comments extends Component {
 
   componentDidUpdate(prevProps, prevState) {
     const articleId = this.props.match.params.article_id;
-    if (this.state !== prevState) {
+    if (this.state.update !== prevState.update) {
       api
         .fetchCommentsByArticle(articleId)
         .then(comments => {
-          this.setState({
-            comments
-          });
+          this.setState({ comments, update: false });
         })
         .catch(console.log);
     }
   }
-
   render() {
     const { comments } = this.state;
     return (
@@ -39,16 +40,22 @@ class Comments extends Component {
         {comments.map((comment, index) => {
           const id = comment._id;
           return (
-            <div>
+            <div key={index}>
               <div>
                 <p>{comment.body}</p>
                 <p>
-                  <span>created {comment.created_at} </span>
+                  <span>created {dayjs(comment.created_at).fromNow()} </span>
                   <span>author {comment.created_by} </span>
                   <span>votes {comment.votes}</span>
                 </p>
               </div>
-              <button
+              <Vote
+                index={index}
+                id={id}
+                name="comments"
+                handleClick={this.handleClick}
+              />
+              {/* <button
                 className={index}
                 value={id}
                 name="comments"
@@ -63,7 +70,7 @@ class Comments extends Component {
                 onClick={this.handleClick}
               >
                 down
-              </button>
+              </button> */}
               <button
                 className={index}
                 value={id}
@@ -81,8 +88,7 @@ class Comments extends Component {
 
   handleClick = e => {
     const action = e.target.innerText;
-    if (action === "delete") this.deleteComment(e);
-    else this.changeVote(e);
+    action === "delete" ? this.deleteComment(e) : this.changeVote(e);
   };
 
   deleteComment = e => {
@@ -92,17 +98,18 @@ class Comments extends Component {
         `https://nc-news-portfolio.herokuapp.com/api/comments/${commentId}`
       );
       this.setState({
-        currentComment: `${commentId}`
+        currentComment: `${commentId}`,
+        update: true
       });
       window.alert("Comment will be deleted");
     }
   };
 
   changeVote = e => {
-    const endpoint = e.target.name;
+    const collection = e.target.name;
     const id = e.target.value;
     const voteType = e.target.innerText;
-    api.modifyVotes(endpoint, id, voteType);
+    api.modifyVotes(collection, id, voteType);
     const key = e.target.className;
     const voteModify = e.target.innerText === "up" ? 1 : -1;
     const updatedComments = this.state.comments.map((comment, index) => {
@@ -112,7 +119,7 @@ class Comments extends Component {
       }
       return newComment;
     });
-    this.setState({ comments: updatedComments });
+    this.setState({ comments: updatedComments, update: true });
   };
 }
 

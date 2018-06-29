@@ -4,7 +4,7 @@ import * as api from "../api";
 import AddComment from "./AddComment";
 
 class Article extends Component {
-  state = { article: {}, addComment: false };
+  state = { article: {}, addComment: false, update: false };
 
   componentDidMount() {
     const articleId = this.props.match.params.article_id;
@@ -15,12 +15,23 @@ class Article extends Component {
     });
   }
 
+  componentDidUpdate(prevProps, prevState) {
+    if (this.state.update !== prevState.update) {
+      api
+        .fetchArticles()
+        .then(articles => {
+          this.setState({ articles, update: false, addComment: false });
+        })
+        .catch(console.log);
+    }
+  }
+
   render() {
     let { title, votes, comments, created_by, body } = this.state.article;
     const id = this.state.article._id;
     return (
       <div>
-        <p>
+        <h2>
           <span
             className="article-header"
             onClick={this.props.handleArticleClick}
@@ -39,11 +50,11 @@ class Article extends Component {
               <span> Comments: {comments}</span>
             </Link>
           </div>
-        </p>
-        <button value={id} name="up" onClick={this.props.handleClick}>
+        </h2>
+        <button value={id} name="articles" onClick={this.props.handleClick}>
           up
         </button>
-        <button value={id} name="down" onClick={this.props.handleClick}>
+        <button value={id} name="articles" onClick={this.props.handleClick}>
           down
         </button>
         <button value={id} name="comment" onClick={this.handleClick}>
@@ -57,9 +68,30 @@ class Article extends Component {
       </div>
     );
   }
-  handleClick = () => {
-    const comment = !this.state.addComment;
-    this.setState({ addComment: comment });
+  handleClick = e => {
+    if (e.target.innerText === "comment") {
+      const comment = !this.state.addComment;
+      this.setState({ addComment: comment });
+    } else {
+      this.changeVoteCount(e);
+    }
+  };
+  changeVoteCount = e => {
+    console.log(e.target);
+    const collection = e.target.name;
+    const id = e.target.value;
+    const voteType = e.target.innerText;
+    api.modifyVotes(collection, id, voteType);
+    const key = e.target.className;
+    const voteModify = e.target.innerText === "up" ? 1 : -1;
+    const updatedArticles = this.state.articles.map((article, index) => {
+      const newArticle = { ...article };
+      if (index === key) {
+        article.votes += voteModify;
+      }
+      return newArticle;
+    });
+    this.setState({ updatedArticles, update: true });
   };
 }
 

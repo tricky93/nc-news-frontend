@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
+import Vote from "./Vote";
 
 class ArticleList extends Component {
   render() {
@@ -10,7 +11,7 @@ class ArticleList extends Component {
           const id = article._id;
           return (
             <div className="article" key={article._id}>
-              <p>
+              <h2>
                 <Link to={`/articles/${id}`}>
                   <span
                     id={article._id}
@@ -33,23 +34,13 @@ class ArticleList extends Component {
                     <span> Comments: {comments}</span>
                   </Link>
                 </div>
-              </p>
-              <button
-                className={index}
-                value={id}
+              </h2>
+              <Vote
+                index={index}
+                id={id}
+                handleClick={this.props.handleClick}
                 name="articles"
-                onClick={this.props.handleClick}
-              >
-                up
-              </button>
-              <button
-                className={index}
-                value={id}
-                name="articles"
-                onClick={this.props.handleClick}
-              >
-                down
-              </button>
+              />
             </div>
           );
         })}
