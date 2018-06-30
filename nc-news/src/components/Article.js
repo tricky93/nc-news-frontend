@@ -30,40 +30,45 @@ class Article extends Component {
     let { title, votes, comments, created_by, body } = this.state.article;
     const id = this.state.article._id;
     return (
-      <div>
-        <h2>
+      <div id="central-column">
+        <h1>
+          {" "}
           <span
             className="article-header"
             onClick={this.props.handleArticleClick}
           >
             {title}{" "}
           </span>
-          <span className="article-body"> {body}</span>
-          <div className="article-footer">
-            <span>
-              {" "}
-              Author: <Link to={`/users/${created_by}`}>{created_by}</Link>
-            </span>
-            <span> Votes: {votes}</span>
-            <Link to={`/articles/${id}/comments`}>
-              {" "}
-              <span> Comments: {comments}</span>
-            </Link>
-          </div>
-        </h2>
-        <button value={id} name="articles" onClick={this.props.handleClick}>
-          up
-        </button>
-        <button value={id} name="articles" onClick={this.props.handleClick}>
-          down
-        </button>
-        <button value={id} name="comment" onClick={this.handleClick}>
-          comment
-        </button>
+        </h1>
         <div>
-          {this.state.addComment && (
-            <AddComment articleTitle={title} articleId={id} />
-          )}
+          <h2>
+            <span className="article-body"> {body}</span>
+            <div className="article-footer">
+              <span>
+                {" "}
+                Author: <Link to={`/users/${created_by}`}>{created_by}</Link>
+              </span>
+              <span> Votes: {votes}</span>
+              <Link to={`/articles/${id}/comments`}>
+                {" "}
+                <span> Comments: {comments}</span>
+              </Link>
+            </div>
+          </h2>
+          <button value={id} name="articles" onClick={this.props.handleClick}>
+            up
+          </button>
+          <button value={id} name="articles" onClick={this.props.handleClick}>
+            down
+          </button>
+          <button value={id} name="comment" onClick={this.handleClick}>
+            comment
+          </button>
+          <div>
+            {this.state.addComment && (
+              <AddComment articleTitle={title} articleId={id} />
+            )}
+          </div>
         </div>
       </div>
     );

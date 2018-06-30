@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import axios from "axios";
+import { Link } from "react-router-dom";
 import * as api from "../api";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
@@ -10,7 +11,7 @@ class Comments extends Component {
   state = { comments: [], currentComment: "", update: false };
 
   componentDidMount() {
-    const articleId = this.props.match.params.article_id;
+    const articleId = this.props.id;
     api
       .fetchCommentsByArticle(articleId)
       .then(comments => {
@@ -22,7 +23,7 @@ class Comments extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    const articleId = this.props.match.params.article_id;
+    const articleId = this.props.id;
     if (this.state.update !== prevState.update) {
       api
         .fetchCommentsByArticle(articleId)
@@ -35,50 +36,42 @@ class Comments extends Component {
   render() {
     const { comments } = this.state;
     return (
-      <div>
-        <h1>name of article</h1>
+      <div id="central-column">
         {comments.map((comment, index) => {
-          const id = comment._id;
+          const { _id, votes, created_by, created_at, body } = comment;
+
           return (
             <div key={index}>
-              <div>
-                <p>{comment.body}</p>
+              <article>
+                <div>
+                  <button
+                    className={index}
+                    value={_id}
+                    name="comments"
+                    onClick={this.handleClick}
+                  >
+                    delete
+                  </button>
+                </div>
+                <div>
+                  <p>{body}</p>
+                </div>
                 <p>
-                  <span>created {dayjs(comment.created_at).fromNow()} </span>
-                  <span>author {comment.created_by} </span>
-                  <span>votes {comment.votes}</span>
+                  <span>created {dayjs(created_at).fromNow()} </span>
+                  <span>
+                    {" "}
+                    Author:{" "}
+                    <Link to={`/users/${created_by}`}>{created_by}</Link>
+                  </span>
+                  <span>votes {votes}</span>
                 </p>
-              </div>
+              </article>
               <Vote
                 index={index}
-                id={id}
+                id={_id}
                 name="comments"
                 handleClick={this.handleClick}
               />
-              {/* <button
-                className={index}
-                value={id}
-                name="comments"
-                onClick={this.handleClick}
-              >
-                up
-              </button>
-              <button
-                className={index}
-                value={id}
-                name="comments"
-                onClick={this.handleClick}
-              >
-                down
-              </button> */}
-              <button
-                className={index}
-                value={id}
-                name="comments"
-                onClick={this.handleClick}
-              >
-                delete
-              </button>
             </div>
           );
         })}

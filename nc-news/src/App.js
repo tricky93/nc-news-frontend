@@ -7,6 +7,7 @@ import User from "./components/User";
 import Topic from "./components/Topic";
 import Comments from "./components/Comments";
 import Homepage from "./components/Homepage";
+import Navigation from "./components/Navigation";
 
 class App extends Component {
   state = {
@@ -15,28 +16,16 @@ class App extends Component {
   render() {
     return (
       <div className="App">
-        <header className="App-header">
-          <h1 className="App-title">NC News</h1>
-        </header>
-        <div id="search">
-          <ul>
-            <NavLink to="/articles">
-              <li> All</li>
-            </NavLink>
-            <NavLink to="/topics/cooking">
-              <li>Cooking</li>
-            </NavLink>
-            <NavLink to="/topics/coding">
-              <li> Coding</li>
-            </NavLink>
-            <NavLink to="/topics/football">
-              <li> Football</li>
-            </NavLink>
+        <header>
+          <div class="navbar-brand">
             <NavLink to="/">
-              <li> Home</li>
+              {" "}
+              <h1 className="App-title">NC News</h1>
             </NavLink>
-          </ul>
-        </div>
+          </div>
+          <Navigation />
+        </header>
+
         <div id="wrapper">
           <Route exact path="/" component={Homepage} />
           <Route exact path="/articles" component={Articles} />

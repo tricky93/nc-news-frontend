@@ -1,5 +1,6 @@
 .App {
   text-align: center;
+  color: #000;
 }
 
 .App-header {
@@ -9,16 +10,12 @@
   color: white;
 }
 
-.App-title {
-  font-size: 1.5em;
-}
-
 .App-intro {
   font-size: large;
 }
 
 #search {
-  float: right;
+  color: aqua;
 }
 
 #wrapper {

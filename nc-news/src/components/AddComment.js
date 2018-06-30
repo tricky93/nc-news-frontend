@@ -3,14 +3,14 @@ import axios from "axios";
 
 class AddComment extends Component {
   state = {
+    //default user is set to jessJelly
     body: "",
-    created_by: "jessJelly",
     belongs_to: this.props.articleTitle
   };
   render() {
     return (
       <div>
-        <h1>+ comment</h1>
+        <h1>Post a comment</h1>
         <input
           onChange={this.handleChange}
           type="textbox"
@@ -20,7 +20,12 @@ class AddComment extends Component {
         />
         <input placeholder="username" />
         <p>commenting on {this.props.articleTitle}</p>
-        <button onClick={this.handleClick}>Submit</button>
+        <button
+          class="button is-outlined is-success"
+          onClick={this.handleClick}
+        >
+          Submit
+        </button>
       </div>
     );
   }
@@ -31,7 +36,7 @@ class AddComment extends Component {
   handleClick = e => {
     const newComment = {
       body: this.state.body,
-      created_by: this.state.created_by,
+      created_by: "jessJelly",
       belongs_to: this.state.belongs_to
     };
     if (window.confirm("Are you sure you want to post this comment?")) {
@@ -43,6 +48,9 @@ class AddComment extends Component {
         )
         .then(alert("Your comment was posted"))
         .catch(console.log);
+      this.setState({
+        body: ""
+      });
     }
   };
 }
