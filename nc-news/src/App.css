@@ -25,3 +25,8 @@ button {
 #wrapper {
   margin-top: 4em;
 }
+
+.className {
+  display: flex;
+  align-self: auto;
+}

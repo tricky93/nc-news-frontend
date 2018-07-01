@@ -36,7 +36,7 @@ class Comments extends Component {
   }
   render() {
     const { comments } = this.state;
-    return (
+    return this.state.comments[0] ? (
       <div>
         {comments[0] && (
           <h1 className="title has-text-white">{comments[0].belongs_to}</h1>
@@ -59,7 +59,7 @@ class Comments extends Component {
                   </button>
                 </div>
                 <div className="box-content has-text-light">
-                  <p>{body}</p>
+                  <em>{body}</em>
                 </div>
                 <p className="has-text-white">
                   <span>created {dayjs(created_at).fromNow()} </span>
@@ -82,6 +82,14 @@ class Comments extends Component {
             </div>
           );
         })}
+      </div>
+    ) : (
+      <div className="section">
+        <img
+          className="loader"
+          src="https://media.giphy.com/media/3o7bu3XilJ5BOiSGic/giphy.gif"
+          alt="loading spinner"
+        />
       </div>
     );
   }

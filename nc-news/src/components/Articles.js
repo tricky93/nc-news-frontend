@@ -33,7 +33,7 @@ class Articles extends Component {
   }
 
   render() {
-    return (
+    return this.state.articles[0] ? (
       <div>
         <ArticleList
           handleArticleClick={this.handleArticleClick}
@@ -43,6 +43,14 @@ class Articles extends Component {
           filtered={this.state.articles.filter(article => {
             return article.created_by === this.props.userName;
           })}
+        />
+      </div>
+    ) : (
+      <div className="section">
+        <img
+          className="loader"
+          src="https://media.giphy.com/media/3o7bu3XilJ5BOiSGic/giphy.gif"
+          alt="loading spinner"
         />
       </div>
     );

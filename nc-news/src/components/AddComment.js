@@ -40,7 +40,12 @@ class AddComment extends Component {
       created_by: "jessJelly",
       belongs_to: this.state.belongs_to
     };
-    if (window.confirm("Are you sure you want to post this comment?")) {
+    if (!this.state.body) {
+      alert("Please enter a comment");
+    } else if (
+      !this.state.body &&
+      window.confirm("Are you sure you want to post this comment?")
+    ) {
       const articleId = this.props.articleId;
       api
         .postAComment(articleId, newComment)

@@ -11,7 +11,7 @@ class ArticleList extends Component {
       articleCollection = this.props.articles;
     }
     return (
-      <div className="column">
+      <div className="section">
         {articleCollection.map((article, index) => {
           const { title, votes, comments, created_by, body, _id } = article;
           const voteStyle = votes < 0 ? "redVote" : "greenVote";

@@ -37,12 +37,19 @@ class Topic extends Component {
   }
 
   render() {
-    return (
+    return this.state.articles[0] ? (
       <ArticleList
         handleArticleClick={this.handleArticleClick}
         handleClick={this.handleClick}
         articles={this.state.articles}
       />
+    ) : (
+      <div className="section">
+        <img
+          src="https://media.giphy.com/media/3o7bu3XilJ5BOiSGic/giphy.gif"
+          alt="loading spinner"
+        />
+      </div>
     );
   }
   handleArticleClick = e => {

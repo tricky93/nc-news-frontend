@@ -5,13 +5,14 @@ import AddComment from "./AddComment";
 import Vote from "./Vote";
 
 class Article extends Component {
-  state = { article: {}, addComment: false, update: false };
+  state = { article: {}, addComment: false, update: false, loaded: false };
 
   componentDidMount() {
     const articleId = this.props.match.params.article_id;
     api.fetchArticle(articleId).then(article => {
       this.setState({
-        article
+        article,
+        loaded: true
       });
     });
   }
@@ -31,7 +32,7 @@ class Article extends Component {
   render() {
     let { title, votes, comments, created_by, body, _id } = this.state.article;
     const voteStyle = votes < 0 ? "redVote" : "greenVote";
-    return (
+    return this.state.loaded ? (
       <div className="column">
         <div className="box has-background-black-ter">
           <h1>
@@ -82,6 +83,14 @@ class Article extends Component {
             </div>
           </div>
         </div>
+      </div>
+    ) : (
+      <div className="section">
+        <img
+          className="loader"
+          src="https://media.giphy.com/media/3o7bu3XilJ5BOiSGic/giphy.gif"
+          alt="loading spinner"
+        />
       </div>
     );
   }
