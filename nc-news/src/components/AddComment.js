@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import axios from "axios";
+import * as api from "../api";
 
 class AddComment extends Component {
   state = {
@@ -10,18 +10,19 @@ class AddComment extends Component {
   render() {
     return (
       <div>
-        <h1>Post a comment</h1>
+        <h1 className="has-text-white">Post a comment</h1>
+        <input placeholder="username" />
         <input
+          className="input is-large"
           onChange={this.handleChange}
           type="textbox"
           placeholder="comment here"
           value={this.state.body}
           required
         />
-        <input placeholder="username" />
-        <p>commenting on {this.props.articleTitle}</p>
+
         <button
-          class="button is-outlined is-success"
+          class="button is-outlined is-dark is-small"
           onClick={this.handleClick}
         >
           Submit
@@ -41,11 +42,8 @@ class AddComment extends Component {
     };
     if (window.confirm("Are you sure you want to post this comment?")) {
       const articleId = this.props.articleId;
-      axios
-        .post(
-          `https://nc-news-portfolio.herokuapp.com/api/articles/${articleId}/comments`,
-          newComment
-        )
+      api
+        .postAComment(articleId, newComment)
         .then(alert("Your comment was posted"))
         .catch(console.log);
       this.setState({

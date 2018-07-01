@@ -1,55 +1,64 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
-import Comments from "./Comments";
 import Vote from "./Vote";
 
 class ArticleList extends Component {
-  state = { showComments: false };
+  state = { showComment: false };
   render() {
+    let articleCollection;
+    if (this.props.userName) articleCollection = this.props.filtered;
+    else {
+      articleCollection = this.props.articles;
+    }
     return (
-      <div id="central-column">
-        {this.props.articles.map((article, index) => {
+      <div className="column">
+        {articleCollection.map((article, index) => {
           const { title, votes, comments, created_by, body, _id } = article;
-          const id = article._id;
+          const voteStyle = votes < 0 ? "redVote" : "greenVote";
           return (
-            <div key={article._id}>
-              <Link to={`/articles/${id}`}>
-                <span id={article._id} onClick={this.props.handleArticleClick}>
-                  {title}{" "}
-                </span>
-              </Link>
-
-              <div> {body.slice(0, 101)}...</div>
-              <div className="article-footer">
-                <span>
+            <div key={_id} className="box has-background-black-ter">
+              <div className="box-content">
+                <Link to={`/articles/${_id}`}>
+                  <h2
+                    className="title has-text-white"
+                    id={_id}
+                    onClick={this.props.handleArticleClick}
+                  >
+                    {title}{" "}
+                  </h2>
+                </Link>
+                <div className="content has-text-light">
                   {" "}
-                  Author: <Link to={`/users/${created_by}`}>{created_by}</Link>
-                </span>
-                <span> Votes: {votes}</span>{" "}
-                {/* <Link to={`/articles/${id}/comments`}>
-                  {" "}
-                  <span> Comments: {comments}</span>
-                </Link> */}
-                <span onClick={this.handleClick}>Comments : {comments}</span>
+                  {body.slice(0, 150)}...
+                </div>
+                <div className="has-text-white">
+                  <span>
+                    {" "}
+                    Author:{" "}
+                    <Link to={`/users/${created_by}`}>{created_by}</Link>
+                  </span>
+                  <span>
+                    {" "}
+                    Votes: <span className={voteStyle}>{votes}</span>
+                  </span>{" "}
+                  <Link to={`/articles/${_id}/comments`}>
+                    {" "}
+                    <span> Comments: {comments}</span>
+                  </Link>
+                </div>
+                <Vote
+                  index={index}
+                  id={_id}
+                  handleClick={this.props.handleClick}
+                  name="articles"
+                />
               </div>
-
-              <Vote
-                index={index}
-                id={id}
-                handleClick={this.props.handleClick}
-                name="articles"
-              />
-              <div>{this.state.showComments && <Comments id={_id} />}</div>
             </div>
           );
         })}
       </div>
     );
   }
-  handleClick = () => {
-    const change = !this.state.showComments;
-    this.setState({ showComments: change });
-  };
 }
 
 export default ArticleList;

@@ -11,7 +11,8 @@ class Comments extends Component {
   state = { comments: [], currentComment: "", update: false };
 
   componentDidMount() {
-    const articleId = this.props.id;
+    const articleId = this.props.match.params.article_id;
+    console.log(this.props);
     api
       .fetchCommentsByArticle(articleId)
       .then(comments => {
@@ -23,7 +24,7 @@ class Comments extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    const articleId = this.props.id;
+    const articleId = this.props.match.params.article_id;
     if (this.state.update !== prevState.update) {
       api
         .fetchCommentsByArticle(articleId)
@@ -36,16 +37,20 @@ class Comments extends Component {
   render() {
     const { comments } = this.state;
     return (
-      <div id="central-column">
+      <div>
+        {comments[0] && (
+          <h1 className="title has-text-white">{comments[0].belongs_to}</h1>
+        )}
         {comments.map((comment, index) => {
           const { _id, votes, created_by, created_at, body } = comment;
-
+          const voteStyle = votes < 0 ? "redVote" : "greenVote";
           return (
-            <div key={index}>
+            <div key={index} className="box has-background-black-ter">
               <article>
                 <div>
                   <button
                     className={index}
+                    class="delete is-small is-danger"
                     value={_id}
                     name="comments"
                     onClick={this.handleClick}
@@ -53,17 +58,19 @@ class Comments extends Component {
                     delete
                   </button>
                 </div>
-                <div>
+                <div className="box-content has-text-light">
                   <p>{body}</p>
                 </div>
-                <p>
+                <p className="has-text-white">
                   <span>created {dayjs(created_at).fromNow()} </span>
-                  <span>
+                  <span className="title is-6">
                     {" "}
-                    Author:{" "}
                     <Link to={`/users/${created_by}`}>{created_by}</Link>
                   </span>
-                  <span>votes {votes}</span>
+                  <span>
+                    {" "}
+                    votes <span className={voteStyle}>{votes}</span>
+                  </span>
                 </p>
               </article>
               <Vote
@@ -90,11 +97,11 @@ class Comments extends Component {
       axios.delete(
         `https://nc-news-portfolio.herokuapp.com/api/comments/${commentId}`
       );
+      window.alert("Comment will be deleted");
       this.setState({
         currentComment: `${commentId}`,
         update: true
       });
-      window.alert("Comment will be deleted");
     }
   };
 

@@ -34,11 +34,17 @@ class Articles extends Component {
 
   render() {
     return (
-      <ArticleList
-        handleArticleClick={this.handleArticleClick}
-        handleClick={this.handleClick}
-        articles={this.state.articles}
-      />
+      <div>
+        <ArticleList
+          handleArticleClick={this.handleArticleClick}
+          handleClick={this.handleClick}
+          articles={this.state.articles}
+          userName={this.props.userName}
+          filtered={this.state.articles.filter(article => {
+            return article.created_by === this.props.userName;
+          })}
+        />
+      </div>
     );
   }
   handleArticleClick = e => {

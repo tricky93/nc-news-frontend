@@ -27,3 +27,11 @@ export const fetchCommentsByArticle = articleId => {
 export const modifyVotes = (collection, id, voteType) => {
   return axios.put(`${url}/${collection}/${id}?vote=${voteType}`);
 };
+
+export const fetchUser = username => {
+  return axios.get(`${url}/users/${username}`);
+};
+
+export const postAComment = (articleId, newComment) => {
+  return axios.post(`${url}/articles/${articleId}/comments`, newComment);
+};

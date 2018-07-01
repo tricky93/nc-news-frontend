@@ -4,7 +4,12 @@ class Homepage extends Component {
   render() {
     return (
       <div>
-        <h1>HOMEPAGE</h1>
+        <article class="message">
+          <div class="message-header">
+            <p>Hello World</p>
+          </div>
+          <div class="message-body">Welcome to Northcoders News</div>
+        </article>
       </div>
     );
   }

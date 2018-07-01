@@ -5,6 +5,7 @@ const Vote = props => {
     <div>
       <button
         className={props.index}
+        class="button is-small is-success is-outlined"
         value={props.id}
         name={props.name}
         onClick={props.handleClick}
@@ -13,6 +14,7 @@ const Vote = props => {
       </button>
       <button
         className={props.index}
+        class="button is-small is-danger is-outlined "
         value={props.id}
         name={props.name}
         onClick={props.handleClick}

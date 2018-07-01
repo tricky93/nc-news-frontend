@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import * as api from "../api";
 import AddComment from "./AddComment";
+import Vote from "./Vote";
 
 class Article extends Component {
   state = { article: {}, addComment: false, update: false };
@@ -16,58 +17,69 @@ class Article extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
+    const articleId = this.props.match.params.article_id;
     if (this.state.update !== prevState.update) {
       api
-        .fetchArticles()
-        .then(articles => {
-          this.setState({ articles, update: false, addComment: false });
+        .fetchArticle(articleId)
+        .then(article => {
+          this.setState({ article, update: false, addComment: false });
         })
         .catch(console.log);
     }
   }
 
   render() {
-    let { title, votes, comments, created_by, body } = this.state.article;
-    const id = this.state.article._id;
+    let { title, votes, comments, created_by, body, _id } = this.state.article;
+    const voteStyle = votes < 0 ? "redVote" : "greenVote";
     return (
-      <div id="central-column">
-        <h1>
-          {" "}
-          <span
-            className="article-header"
-            onClick={this.props.handleArticleClick}
-          >
-            {title}{" "}
-          </span>
-        </h1>
-        <div>
-          <h2>
-            <span className="article-body"> {body}</span>
-            <div className="article-footer">
-              <span>
-                {" "}
-                Author: <Link to={`/users/${created_by}`}>{created_by}</Link>
-              </span>
-              <span> Votes: {votes}</span>
-              <Link to={`/articles/${id}/comments`}>
-                {" "}
-                <span> Comments: {comments}</span>
-              </Link>
-            </div>
-          </h2>
-          <button value={id} name="articles" onClick={this.props.handleClick}>
-            up
-          </button>
-          <button value={id} name="articles" onClick={this.props.handleClick}>
-            down
-          </button>
-          <button value={id} name="comment" onClick={this.handleClick}>
-            comment
-          </button>
+      <div className="column">
+        <div className="box has-background-black-ter">
+          <h1>
+            {" "}
+            <span
+              className="title has-text-white"
+              onClick={this.props.handleArticleClick}
+            >
+              {title}{" "}
+            </span>
+          </h1>
           <div>
-            {this.state.addComment && (
-              <AddComment articleTitle={title} articleId={id} />
-            )}
+            <h2>
+              <span className="content has-text-light"> {body}</span>
+              <div className="has-text-white">
+                <span>
+                  {" "}
+                  <Link to={`/users/${created_by}`}>{created_by}</Link>
+                </span>
+                <span>
+                  {" "}
+                  Votes: <span className={voteStyle}>{votes}</span>
+                </span>
+                <Link to={`/articles/${_id}/comments`}>
+                  {" "}
+                  <span> Comments: {comments}</span>
+                </Link>
+              </div>
+            </h2>
+            <Vote
+              index={0}
+              id={_id}
+              handleClick={this.handleClick}
+              name="articles"
+            />
+            <button
+              class="button is-small is-outlined is-info"
+              value={_id}
+              name="comment"
+              onClick={this.handleClick}
+            >
+              comment
+            </button>
+            <div>
+              {this.state.addComment && (
+                <AddComment articleTitle={title} articleId={_id} />
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -82,21 +94,16 @@ class Article extends Component {
     }
   };
   changeVoteCount = e => {
-    console.log(e.target);
     const collection = e.target.name;
     const id = e.target.value;
     const voteType = e.target.innerText;
     api.modifyVotes(collection, id, voteType);
-    const key = e.target.className;
     const voteModify = e.target.innerText === "up" ? 1 : -1;
-    const updatedArticles = this.state.articles.map((article, index) => {
-      const newArticle = { ...article };
-      if (index === key) {
-        article.votes += voteModify;
-      }
-      return newArticle;
-    });
-    this.setState({ updatedArticles, update: true });
+    const updatedArticle = { ...this.state.article };
+
+    updatedArticle.votes += voteModify;
+
+    this.setState({ updatedArticle, update: true });
   };
 }
 
