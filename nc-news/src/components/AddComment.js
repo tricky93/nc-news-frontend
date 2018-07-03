@@ -9,24 +9,26 @@ class AddComment extends Component {
   };
   render() {
     return (
-      <div>
-        <h1 className="has-text-white">Post a comment</h1>
-        <input placeholder="username" />
-        <input
-          className="input is-large"
-          onChange={this.handleChange}
-          type="textbox"
-          placeholder="comment here"
-          value={this.state.body}
-          required
-        />
+      <div className="section">
+        <div className="box has-background-grey-dark">
+          <h1 className="has-text-white">Post a comment</h1>
+          <input placeholder="username" />
+          <input
+            className="input is-large"
+            onChange={this.handleChange}
+            type="textbox"
+            placeholder="comment here"
+            value={this.state.body}
+            required
+          />
 
-        <button
-          class="button is-outlined is-dark is-small"
-          onClick={this.handleClick}
-        >
-          Submit
-        </button>
+          <button
+            class="button is-outlined is-dark is-small"
+            onClick={this.handleClick}
+          >
+            Submit
+          </button>
+        </div>
       </div>
     );
   }
