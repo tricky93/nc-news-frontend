@@ -1,16 +1,16 @@
 import React from "react";
 
-const Homepage = () => {
+const Errorpage = () => {
   return (
     <div>
       <article class="message">
         <div class="message-header">
-          <p>Hello World</p>
+          <p>ERROR</p>
         </div>
-        <div class="message-body">Welcome to Northcoders News</div>
+        <div class="message-body">Whoops something went wrong</div>
       </article>
     </div>
   );
 };
 
-export default Homepage;
+export default Errorpage;

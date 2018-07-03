@@ -4,6 +4,7 @@ import Vote from "./Vote";
 
 class ArticleList extends Component {
   state = { showComment: false };
+
   render() {
     let articleCollection;
     if (this.props.userName) articleCollection = this.props.filtered;
@@ -13,7 +14,7 @@ class ArticleList extends Component {
     return (
       <div className="section">
         {articleCollection.map((article, index) => {
-          const { title, votes, comments, created_by, body, _id } = article;
+          const { title, votes, comments, created_by, _id } = article;
           const voteStyle = votes < 0 ? "redVote" : "greenVote";
           return (
             <div key={_id} className="box has-background-black-ter">
@@ -27,24 +28,15 @@ class ArticleList extends Component {
                     {title}{" "}
                   </h2>
                 </Link>
-                <div className="content has-text-light">
-                  {" "}
-                  {body.slice(0, 150)}...
-                </div>
                 <div className="has-text-white">
                   <span>
-                    {" "}
-                    Author:{" "}
                     <Link to={`/users/${created_by}`}>{created_by}</Link>
                   </span>
                   <span>
                     {" "}
                     Votes: <span className={voteStyle}>{votes}</span>
                   </span>{" "}
-                  <Link to={`/articles/${_id}/comments`}>
-                    {" "}
-                    <span> Comments: {comments}</span>
-                  </Link>
+                  <span> Comments: {comments}</span>
                 </div>
                 <Vote
                   index={index}

@@ -1,12 +1,15 @@
 import React, { Component } from "react";
 import * as api from "../api";
+import { Redirect } from "react-router-dom";
 import ArticleList from "./ArticleList";
+import LoadSpinner from "./LoadSpinner";
 
 class Topic extends Component {
   state = {
     articles: [],
     currentArticle: "",
-    update: false
+    update: false,
+    loaded: false
   };
 
   componentDidMount() {
@@ -15,10 +18,14 @@ class Topic extends Component {
       .fetchArticlesByTopic(topicSlug)
       .then(articles => {
         this.setState({
-          articles
+          articles,
+          loaded: true
         });
       })
-      .catch(console.log);
+      .catch(err => {
+        this.props.history.push("/404");
+        this.setState({ invalidUrl: true });
+      });
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -32,24 +39,24 @@ class Topic extends Component {
         .then(articles => {
           this.setState({ articles, update: false });
         })
-        .catch(console.log);
+        .catch(err => {
+          this.props.history.push("/404");
+          this.setState({ invalidUrl: true });
+        });
     }
   }
 
   render() {
-    return this.state.articles[0] ? (
+    return this.state.invalidUrl ? (
+      <Redirect to="/404" />
+    ) : this.state.loaded ? (
       <ArticleList
         handleArticleClick={this.handleArticleClick}
         handleClick={this.handleClick}
         articles={this.state.articles}
       />
     ) : (
-      <div className="section">
-        <img
-          src="https://media.giphy.com/media/3o7bu3XilJ5BOiSGic/giphy.gif"
-          alt="loading spinner"
-        />
-      </div>
+      <LoadSpinner />
     );
   }
   handleArticleClick = e => {

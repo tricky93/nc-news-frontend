@@ -1,11 +1,14 @@
 import React, { Component } from "react";
 import * as api from "../api";
+import { Redirect } from "react-router-dom";
 import Articles from "./Articles";
+import LoadSpinner from "./LoadSpinner";
 
 class User extends Component {
   state = {
     user: {},
-    articles: []
+    articles: [],
+    loaded: false
   };
 
   componentDidMount() {
@@ -14,14 +17,20 @@ class User extends Component {
       .fetchUser(username)
       .then(({ data }) => {
         this.setState({
-          user: data.user
+          user: data.user,
+          loaded: true
         });
       })
-      .catch(console.log);
+      .catch(err => {
+        this.props.history.push("/404");
+        this.setState({ invalidUrl: true });
+      });
   }
   render() {
     const { avatar_url, username, name } = this.state.user;
-    return (
+    return this.state.invalidUrl ? (
+      <Redirect to="/404" />
+    ) : this.state.loaded ? (
       <div className="section">
         <div className="box">
           <article className="media">
@@ -45,6 +54,8 @@ class User extends Component {
         </div>
         <Articles userName={username} />
       </div>
+    ) : (
+      <LoadSpinner />
     );
   }
 }

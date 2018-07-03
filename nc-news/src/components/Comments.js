@@ -1,51 +1,63 @@
 import React, { Component } from "react";
-import axios from "axios";
-import { Link } from "react-router-dom";
+import { Link, Redirect } from "react-router-dom";
 import * as api from "../api";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import Vote from "./Vote";
+import LoadSpinner from "./LoadSpinner";
 dayjs.extend(relativeTime);
 
 class Comments extends Component {
-  state = { comments: [], currentComment: "", update: false };
+  state = {
+    comments: [],
+    loaded: false,
+    update: false,
+    delete: false,
+    modalStyle: "modal",
+    commentId: ""
+  };
 
   componentDidMount() {
-    const articleId = this.props.match.params.article_id;
-    console.log(this.props);
+    //const articleId = this.props.match.params.article_id;
     api
-      .fetchCommentsByArticle(articleId)
+      .fetchCommentsByArticle(this.props.articleId)
       .then(comments => {
         this.setState({
-          comments
+          comments,
+          loaded: true
         });
       })
-      .catch(console.log);
+      .catch(err => {
+        this.props.history.push("/404");
+        this.setState({ invalidUrl: true });
+      });
   }
 
   componentDidUpdate(prevProps, prevState) {
-    const articleId = this.props.match.params.article_id;
+    //const articleId = this.props.match.params.article_id;
     if (this.state.update !== prevState.update) {
       api
-        .fetchCommentsByArticle(articleId)
+        .fetchCommentsByArticle(this.props.articleId)
         .then(comments => {
           this.setState({ comments, update: false });
         })
-        .catch(console.log);
+        .catch(err => {
+          this.props.history.push("/404");
+          this.setState({ invalidUrl: true });
+        });
     }
   }
   render() {
     const { comments } = this.state;
-    return this.state.comments[0] ? (
+    return this.state.invalidUrl ? (
+      <Redirect to="/404" />
+    ) : this.state.loaded ? (
       <div>
-        {comments[0] && (
-          <h1 className="title has-text-white">{comments[0].belongs_to}</h1>
-        )}
         {comments.map((comment, index) => {
           const { _id, votes, created_by, created_at, body } = comment;
           const voteStyle = votes < 0 ? "redVote" : "greenVote";
           return (
-            <div key={index} className="box has-background-black-ter">
+            <div key={index} className="box has-background-grey-dark">
               <article>
                 <div>
                   <button
@@ -82,33 +94,65 @@ class Comments extends Component {
             </div>
           );
         })}
+        <div className={this.state.modalStyle}>
+          <div className="modal-background" />
+          <div className="modal-content">
+            <h1>Are you sure you want to delete this comment?</h1>
+            <button
+              className="button"
+              onClick={this.handleClick}
+              name="confirm"
+            >
+              Yes
+            </button>
+            <button
+              className="button"
+              onClick={this.handleClick}
+              name="confirm"
+            >
+              No
+            </button>
+          </div>
+          <button className="modal-close is-large" aria-label="close" />
+        </div>
       </div>
     ) : (
-      <div className="section">
-        <img
-          className="loader"
-          src="https://media.giphy.com/media/3o7bu3XilJ5BOiSGic/giphy.gif"
-          alt="loading spinner"
-        />
-      </div>
+      <LoadSpinner />
     );
   }
 
   handleClick = e => {
     const action = e.target.innerText;
-    action === "delete" ? this.deleteComment(e) : this.changeVote(e);
+    const commentId = e.target.value;
+    if (action === "delete") {
+      this.setState({
+        modalStyle: "modal is-active",
+        commentId: commentId
+      });
+    }
+    if (e.target.name === "confirm") this.deleteComment(e);
+    else {
+      this.changeVote(e);
+    }
   };
 
   deleteComment = e => {
-    const commentId = e.target.value;
-    if (window.confirm("Do you really want to delete this comment?")) {
-      axios.delete(
-        `https://nc-news-portfolio.herokuapp.com/api/comments/${commentId}`
-      );
-      window.alert("Comment will be deleted");
+    const commentId = this.state.commentId;
+    if (e.target.innerText === "Yes") {
+      api.deleteAComment(commentId).catch(console.log);
       this.setState({
-        currentComment: `${commentId}`,
-        update: true
+        update: true,
+        delete: false,
+        modalStyle: "modal",
+        commentId: ""
+      });
+    }
+    if (e.target.innerText === "No") {
+      this.setState({
+        update: true,
+        delete: false,
+        modalStyle: "modal",
+        commentId: ""
       });
     }
   };

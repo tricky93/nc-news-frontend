@@ -35,3 +35,7 @@ export const fetchUser = username => {
 export const postAComment = (articleId, newComment) => {
   return axios.post(`${url}/articles/${articleId}/comments`, newComment);
 };
+
+export const deleteAComment = commentId => {
+  return axios.delete(`${url}/comments/${commentId}`);
+};

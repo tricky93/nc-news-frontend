@@ -1,38 +1,57 @@
 import React, { Component } from "react";
-import { Link } from "react-router-dom";
+import { Link, Redirect } from "react-router-dom";
 import * as api from "../api";
 import AddComment from "./AddComment";
 import Vote from "./Vote";
+import Comments from "./Comments";
+import LoadSpinner from "./LoadSpinner";
 
 class Article extends Component {
   state = { article: {}, addComment: false, update: false, loaded: false };
 
   componentDidMount() {
     const articleId = this.props.match.params.article_id;
-    api.fetchArticle(articleId).then(article => {
-      this.setState({
-        article,
-        loaded: true
+    api
+      .fetchArticle(articleId)
+      .then(article => {
+        this.setState({
+          article,
+          loaded: true
+        });
+      })
+      .catch(err => {
+        this.props.history.push("/404");
+        this.setState({ invalidUrl: true });
       });
-    });
   }
 
   componentDidUpdate(prevProps, prevState) {
     const articleId = this.props.match.params.article_id;
+
     if (this.state.update !== prevState.update) {
       api
         .fetchArticle(articleId)
         .then(article => {
-          this.setState({ article, update: false, addComment: false });
+          this.setState({
+            article,
+            loaded: true,
+            update: false,
+            addComment: false
+          });
         })
-        .catch(console.log);
+        .catch(err => {
+          this.props.history.push("/404");
+          this.setState({ invalidUrl: true });
+        });
     }
   }
 
   render() {
     let { title, votes, comments, created_by, body, _id } = this.state.article;
     const voteStyle = votes < 0 ? "redVote" : "greenVote";
-    return this.state.loaded ? (
+    return this.state.invalidUrl ? (
+      <Redirect to="/404" />
+    ) : this.state.loaded ? (
       <div className="column">
         <div className="box has-background-black-ter">
           <h1>
@@ -56,12 +75,11 @@ class Article extends Component {
                   {" "}
                   Votes: <span className={voteStyle}>{votes}</span>
                 </span>
-                <Link to={`/articles/${_id}/comments`}>
-                  {" "}
-                  <span> Comments: {comments}</span>
-                </Link>
+
+                <span> Comments: {comments}</span>
               </div>
             </h2>
+
             <Vote
               index={0}
               id={_id}
@@ -81,17 +99,12 @@ class Article extends Component {
                 <AddComment articleTitle={title} articleId={_id} />
               )}
             </div>
+            <Comments articleId={_id} />
           </div>
         </div>
       </div>
     ) : (
-      <div className="section">
-        <img
-          className="loader"
-          src="https://media.giphy.com/media/3o7bu3XilJ5BOiSGic/giphy.gif"
-          alt="loading spinner"
-        />
-      </div>
+      <LoadSpinner />
     );
   }
   handleClick = e => {

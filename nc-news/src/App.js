@@ -9,15 +9,13 @@ import Topic from "./components/Topic";
 import Comments from "./components/Comments";
 import Homepage from "./components/Homepage";
 import Navigation from "./components/Navigation";
+import Errorpage from "./components/ErrorPage";
 
 class App extends Component {
-  state = {
-    view: ""
-  };
   render() {
     return (
       <div>
-        <header className="navbar is-fixed-top is-dark">
+        <header className="navbar is-fixed-top has-background-black-ter">
           <div className="navbar-brand">
             <NavLink to="/">
               <img src={logo} alt="Northcoders logo" />
@@ -39,6 +37,7 @@ class App extends Component {
             />
             <Route exact path="/users/:username" component={User} />
             <Route exact path="/topics/:topic" component={Topic} />
+            <Route exact path="/404" component={Errorpage} />
           </div>
         </div>
       </div>
