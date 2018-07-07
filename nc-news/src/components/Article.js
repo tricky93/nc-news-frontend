@@ -7,7 +7,12 @@ import Comments from "./Comments";
 import LoadSpinner from "./LoadSpinner";
 
 class Article extends Component {
-  state = { article: {}, addComment: false, update: false, loaded: false };
+  state = {
+    article: {},
+    addComment: false,
+    update: false,
+    loaded: false
+  };
 
   componentDidMount() {
     const articleId = this.props.match.params.article_id;
@@ -64,42 +69,53 @@ class Article extends Component {
             </span>
           </h1>
           <div>
-            <h2>
-              <span className="content has-text-light"> {body}</span>
-              <div className="has-text-white">
-                <span>
-                  {" "}
-                  <Link to={`/users/${created_by}`}>{created_by}</Link>
-                </span>
-                <span>
-                  {" "}
-                  Votes: <span className={voteStyle}>{votes}</span>
-                </span>
+            <div className="article">
+              <h2>
+                <span className="content has-text-light"> {body}</span>
+                <div className="has-text-white">
+                  <span>
+                    {" "}
+                    <Link to={`/users/${created_by}`}>{created_by}</Link>
+                  </span>
+                  <span>
+                    {" "}
+                    Votes: <span className={voteStyle}>{votes}</span>
+                  </span>
 
-                <span> Comments: {comments}</span>
-              </div>
-            </h2>
-
-            <Vote
-              index={0}
-              id={_id}
-              handleClick={this.handleClick}
-              name="articles"
-            />
-            <button
-              class="button is-small is-outlined is-info"
-              value={_id}
-              name="comment"
-              onClick={this.handleClick}
-            >
-              comment
-            </button>
+                  <span> Comments: {comments}</span>
+                  <div className="commentButton">
+                    <button
+                      class="button is-small is-outlined is-info"
+                      value={_id}
+                      name="comment"
+                      onClick={this.handleClick}
+                    >
+                      🗨️
+                    </button>
+                  </div>
+                  <Vote
+                    index={0}
+                    id={_id}
+                    handleClick={this.handleClick}
+                    name="articles"
+                  />
+                </div>
+              </h2>
+            </div>
             <div>
               {this.state.addComment && (
-                <AddComment articleTitle={title} articleId={_id} />
+                <AddComment
+                  articleTitle={title}
+                  articleId={_id}
+                  postComment={this.postComment}
+                />
               )}
             </div>
-            <Comments articleId={_id} />
+            <Comments
+              articleId={_id}
+              update={this.state.update}
+              author={created_by}
+            />
           </div>
         </div>
       </div>
@@ -108,19 +124,25 @@ class Article extends Component {
     );
   }
   handleClick = e => {
-    if (e.target.innerText === "comment") {
+    if (e.target.innerText === "🗨️") {
       const comment = !this.state.addComment;
       this.setState({ addComment: comment });
     } else {
       this.changeVoteCount(e);
     }
   };
+
+  postComment = () => {
+    this.setState({ update: true });
+  };
+
   changeVoteCount = e => {
     const collection = e.target.name;
     const id = e.target.value;
-    const voteType = e.target.innerText;
+    let voteType = "down";
+    if (e.target.innerText === "⬆️") voteType = "up";
     api.modifyVotes(collection, id, voteType);
-    const voteModify = e.target.innerText === "up" ? 1 : -1;
+    const voteModify = e.target.innerText === "⬆" ? 1 : -1;
     const updatedArticle = { ...this.state.article };
 
     updatedArticle.votes += voteModify;

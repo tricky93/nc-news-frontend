@@ -5,16 +5,16 @@ const Navigation = () => {
   return (
     <div>
       <h3>
-        <NavLink to="/articles">
+        <NavLink to="/articles" activeClassName="selected">
           <span> All </span>
         </NavLink>
-        <NavLink to="/topics/cooking">
+        <NavLink to="/topics/cooking" activeClassName="selected">
           <span>Cooking </span>
         </NavLink>
-        <NavLink to="/topics/coding">
+        <NavLink to="/topics/coding" activeClassName="selected">
           <span> Coding </span>
         </NavLink>
-        <NavLink to="/topics/football">
+        <NavLink to="/topics/football" activeClassName="selected">
           <span> Football </span>
         </NavLink>
       </h3>

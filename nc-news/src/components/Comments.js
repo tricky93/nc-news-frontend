@@ -14,11 +14,11 @@ class Comments extends Component {
     update: false,
     delete: false,
     modalStyle: "modal",
-    commentId: ""
+    commentId: "",
+    commentAuthor: ""
   };
 
   componentDidMount() {
-    //const articleId = this.props.match.params.article_id;
     api
       .fetchCommentsByArticle(this.props.articleId)
       .then(comments => {
@@ -34,8 +34,10 @@ class Comments extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    //const articleId = this.props.match.params.article_id;
-    if (this.state.update !== prevState.update) {
+    if (
+      this.state.update !== prevState.update ||
+      this.prevProps !== prevProps
+    ) {
       api
         .fetchCommentsByArticle(this.props.articleId)
         .then(comments => {
@@ -73,31 +75,35 @@ class Comments extends Component {
                 <div className="box-content has-text-light">
                   <em>{body}</em>
                 </div>
-                <p className="has-text-white">
-                  <span>created {dayjs(created_at).fromNow()} </span>
-                  <span className="title is-6">
-                    {" "}
-                    <Link to={`/users/${created_by}`}>{created_by}</Link>
-                  </span>
-                  <span>
-                    {" "}
-                    votes <span className={voteStyle}>{votes}</span>
-                  </span>
-                </p>
+                <div>
+                  <p className="has-text-white">
+                    <span>created {dayjs(created_at).fromNow()} </span>
+                    <span className="title is-6">
+                      {" "}
+                      <Link to={`/users/${created_by}`}>{created_by}</Link>
+                    </span>
+                    <span>
+                      {" "}
+                      votes <span className={voteStyle}>{votes}</span>
+                    </span>
+                    <Vote
+                      index={index}
+                      id={_id}
+                      name="comments"
+                      handleClick={this.handleClick}
+                    />
+                  </p>
+                </div>
               </article>
-              <Vote
-                index={index}
-                id={_id}
-                name="comments"
-                handleClick={this.handleClick}
-              />
             </div>
           );
         })}
         <div className={this.state.modalStyle}>
           <div className="modal-background" />
           <div className="modal-content">
-            <h1>Are you sure you want to delete this comment?</h1>
+            <h1 className="has-text-white">
+              Are you sure you want to delete this comment?
+            </h1>
             <button
               className="button"
               onClick={this.handleClick}
@@ -127,7 +133,8 @@ class Comments extends Component {
     if (action === "delete") {
       this.setState({
         modalStyle: "modal is-active",
-        commentId: commentId
+        commentId: commentId,
+        commentAuthor: e.target.type
       });
     }
     if (e.target.name === "confirm") this.deleteComment(e);
@@ -160,10 +167,11 @@ class Comments extends Component {
   changeVote = e => {
     const collection = e.target.name;
     const id = e.target.value;
-    const voteType = e.target.innerText;
+    let voteType = "down";
+    if (e.target.innerText === "⬆️") voteType = "up";
     api.modifyVotes(collection, id, voteType);
     const key = e.target.className;
-    const voteModify = e.target.innerText === "up" ? 1 : -1;
+    const voteModify = e.target.innerText === "⬆️" ? 1 : -1;
     const updatedComments = this.state.comments.map((comment, index) => {
       const newComment = { ...comment };
       if (index === key) {

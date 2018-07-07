@@ -43,6 +43,21 @@ button {
   animation: spin 2s linear infinite;
 }
 
+.voteButtons {
+  float: right;
+}
+
+.commentButton {
+  float: right;
+}
+
+.article {
+  margin-bottom: 1em;
+}
+
+.selected {
+  color: red;
+}
 @keyframes spin {
   0% {
     transform: rotate(0deg);

@@ -73,10 +73,11 @@ class Articles extends Component {
   changeVoteCount = e => {
     const collection = e.target.name;
     const id = e.target.value;
-    const voteType = e.target.innerText;
+    let voteType = "down";
+    if (e.target.innerText === "⬆️") voteType = "up";
     api.modifyVotes(collection, id, voteType);
     const key = e.target.className;
-    const voteModify = e.target.innerText === "up" ? 1 : -1;
+    const voteModify = e.target.innerText === "⬆️" ? 1 : -1;
     const updatedArticles = this.state.articles.map((article, index) => {
       const newArticle = { ...article };
       if (index === key) {

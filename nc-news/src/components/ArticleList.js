@@ -37,13 +37,13 @@ class ArticleList extends Component {
                     Votes: <span className={voteStyle}>{votes}</span>
                   </span>{" "}
                   <span> Comments: {comments}</span>
+                  <Vote
+                    index={index}
+                    id={_id}
+                    handleClick={this.props.handleClick}
+                    name="articles"
+                  />
                 </div>
-                <Vote
-                  index={index}
-                  id={_id}
-                  handleClick={this.props.handleClick}
-                  name="articles"
-                />
               </div>
             </div>
           );

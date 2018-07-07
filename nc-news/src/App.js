@@ -24,6 +24,9 @@ class App extends Component {
           <div className="navbar-item">
             <Navigation />
           </div>
+          <div className="navbar-end">
+            <h1>currentUser: jessJelly</h1>
+          </div>
         </header>
         <div id="wrapper">
           <div className="has-navbar-fixed-top container is-fluid">
